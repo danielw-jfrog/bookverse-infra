@@ -1,95 +1,14 @@
-# =============================================================================
-# BookVerse Infrastructure - Comprehensive CI/CD Workflow
-# =============================================================================
-#
-# This GitHub Actions workflow provides complete CI/CD automation for the BookVerse
-# Infrastructure repository, implementing enterprise-grade multi-package builds,
-# shared library management, and foundational artifact publication that supports
-# all BookVerse platform services and provides critical development tooling.
-#
-# 🏗️ WORKFLOW ARCHITECTURE:
-#     - Multi-Package Management: Coordinated builds for multiple infrastructure packages
-#     - Shared Library Publishing: Common utilities and patterns for all services
-#     - DevOps Automation: Centralized scripts and tooling for platform operations
-#     - Evidence Collection: Cryptographic signing and comprehensive infrastructure audit trails
-#     - AppTrust Integration: Automated lifecycle management for foundational components
-#     - Dependency Management: Version coordination and compatibility validation
-#
-# 🚀 KEY FEATURES:
-#     - Enterprise-grade infrastructure library development with dependency management
-#     - Comprehensive testing framework for shared utilities and common patterns
-#     - Advanced multi-package versioning with semantic version coordination
-#     - Automated GitHub Actions and reusable workflow publishing
-#     - Centralized DevOps script validation and distribution management
-#     - Zero-dependency deployment tooling for cross-service compatibility
-#
-# 📊 BUSINESS LOGIC:
-#     - Platform Foundation: Core infrastructure supporting all BookVerse services
-#     - Development Velocity: Shared utilities accelerating service development
-#     - Operational Excellence: Centralized tooling ensuring consistent operations
-#     - Quality Assurance: Common testing patterns and validation frameworks
-#     - Security Standards: Shared security utilities and compliance frameworks
-#     - Deployment Coordination: Infrastructure patterns enabling reliable deployments
-#
-# 🛠️ USAGE PATTERNS:
-#     - Service Development: Shared libraries imported by all BookVerse services
-#     - DevOps Operations: Centralized scripts for platform management and automation
-#     - CI/CD Pipeline: Reusable workflows and actions consumed by service repositories
-#     - Testing Infrastructure: Common test utilities and validation frameworks
-#     - Security Integration: Shared security patterns and compliance tooling
-#
-# ⚡ TRIGGER CONDITIONS:
-#     - Push to Main: Automatic validation and publication of infrastructure updates
-#     - Pull Requests: Comprehensive testing of proposed infrastructure changes
-#     - Manual Dispatch: On-demand builds for infrastructure testing and validation
-#     - Dependency Updates: Automated validation when shared dependencies change
-#
-# 🔧 ENVIRONMENT VARIABLES:
-#     - PROJECT_KEY: BookVerse project identifier for JFrog integration
-#     - JFROG_URL: JFrog Platform URL for infrastructure artifact and evidence management
-#     - GITHUB_TOKEN: GitHub authentication for repository operations
-#     - PACKAGE_REGISTRY: Multi-package registry configuration for library distribution
-#
-# 📈 SUCCESS CRITERIA:
-#     - Library Tests: All shared library packages pass comprehensive validation
-#     - Compatibility Tests: Cross-service integration and dependency validation
-#     - Security Compliance: Infrastructure security scanning and vulnerability assessment
-#     - Performance Validation: Shared utility performance meets efficiency requirements
-#     - Documentation Coverage: Complete API documentation for all published libraries
-#
-# 🏛️ INFRASTRUCTURE SPECIFIC FEATURES:
-#     - Multi-Package Coordination: Synchronized versioning across multiple library packages
-#     - Shared Utility Libraries: Common patterns for database, API, authentication, and logging
-#     - DevOps Script Collection: Centralized automation scripts for platform operations
-#     - GitHub Actions Library: Reusable workflow components and custom actions
-#     - Configuration Management: Shared configuration patterns and environment utilities
-#     - Testing Frameworks: Common testing utilities and validation patterns
-#
-# Authors: BookVerse Platform Team
-# Version: 1.0.0
-#
 name: CI
 
-# 🔄 Concurrency Control: Ensures only one CI build runs per repository at a time
-# Prevents infrastructure conflicts and ensures consistent multi-package testing results
 concurrency:
   group: ci-${{ vars.PROJECT_KEY }}-${{ github.repository }}
   cancel-in-progress: true
 
-# ⚡ Workflow Triggers: Defines when the infrastructure CI pipeline should execute
-# Optimized for continuous validation of shared libraries and foundational components
 on:
-  # 📤 Push Events: Automatic validation when infrastructure code is updated on main branch
   push:
     branches: [main]
-
-  # 🔍 Pull Request Events: Comprehensive testing of proposed infrastructure changes
-  # Ensures shared library quality and compatibility before merging into main branch
   pull_request:
     branches: [main]
-
-  # 🎛️ Manual Dispatch: On-demand execution for infrastructure testing and library validation
-  # Supports manual deployment and cross-service compatibility validation scenarios
   workflow_dispatch:
     inputs:
       reason:
@@ -104,11 +23,6 @@ on:
         type: boolean
 
 jobs:
-  # 🔍 Job: Intelligent Commit Analysis for Infrastructure Library Deployment Decisions
-  # This job analyzes commits to determine whether infrastructure library changes warrant
-  # creating new application versions for deployment. Critical for managing shared library
-  # compatibility and ensuring safe deployment of foundational component updates.
-  # Key outputs: deployment decision, commit classification, library change detection
   analyze-commit:
     name: "Demo: Analyze Commit (Demo-Optimized)"
     runs-on: ubuntu-latest
@@ -119,17 +33,11 @@ jobs:
       core_changed: ${{ steps.detect-changes.outputs.core_changed }}
       devops_changed: ${{ steps.detect-changes.outputs.devops_changed }}
     steps:
-      # 📥 Setup: Repository checkout for infrastructure system analysis
-      # Fetches infrastructure repository source code with commit history
-      # for intelligent analysis of shared library and tooling changes
       - name: "[Setup] Checkout"
         uses: actions/checkout@v6
         with:
           fetch-depth: 2  # Shallow clone with history for library change comparison
 
-      # 🔍 Detection: Infrastructure library change analysis and impact assessment
-      # Analyzes changed files to determine which infrastructure libraries are affected
-      # Critical for coordinating multi-package builds and dependency management
       - name: "[Detection] Library Changes"
         id: detect-changes
         run: |
@@ -203,26 +111,18 @@ jobs:
             echo "📝 Production note: Real systems would be more conservative here"
           fi
 
-  # 🏗️ Job: BookVerse Core Library Build, Test, and Publication
-  # This job builds and publishes the foundational bookverse-core Python library
-  # that provides shared utilities, common patterns, and essential infrastructure
-  # components used by all BookVerse services. Critical for maintaining consistent
-  # development patterns and operational excellence across the platform.
-  # Key outputs: core library package, test coverage, version information
   build-bookverse-core:
     name: "Build: bookverse-core"
     needs: [analyze-commit]
-    # 🎯 Conditional execution: Only runs when core library changes are detected
     if: needs.analyze-commit.outputs.core_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
-        working-directory: libraries/bookverse-core  # Focus on core library directory
-    # 🔐 Security: OIDC permissions for JFrog authentication and library publishing
+        working-directory: libraries/bookverse-core
     permissions:
-      contents: read      # Repository content access for library source code
-      id-token: write    # OIDC token generation for JFrog authentication
+      contents: read
+      id-token: write
     outputs:
       build_name: ${{ steps.set-build-info.outputs.build_name }}
       build_number: ${{ steps.set-build-info.outputs.build_number }}
@@ -230,22 +130,16 @@ jobs:
       coverage_percent: ${{ steps.test-coverage.outputs.coverage_percent }}
 
     steps:
-      # 📥 Setup: Repository checkout for core library source code
-      # Retrieves complete infrastructure repository including
-      # core library implementation and shared utility patterns
       - name: "[Setup] Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      # ℹ️ Information: Core library build context and operational details
-      # Displays comprehensive context about shared library build process
-      # Critical for understanding foundational component deployment workflow
       - name: "[Info] Build Information"
         run: |
-          echo "📚 Building bookverse-core Python library"
-          echo "🔄 Event: ${{ github.event_name }}"
-          echo "👤 Triggered by: ${{ github.actor }}"
-          echo "🕐 Timestamp: $(date -u)"
+          echo "Event: ${{ github.event_name }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Timestamp: $(date -u)"
 
+      # FIXME: These environs can just be set, don't need a whole step
       - name: "[Setup] Build Info"
         id: set-build-info
         run: |
@@ -257,6 +151,7 @@ jobs:
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
           echo "🏷️ Build: $BUILD_NAME"
 
+      # FIXME: Clean up this step.  Move environs to the top of the workflow.
       - name: "[Setup] Install and Configure JFrog CLI"
         uses: jfrog/setup-jfrog-cli@v4
         with:
@@ -273,6 +168,7 @@ jobs:
           JFROG_CLI_BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
           JFROG_CLI_BUILD_PROJECT: ${{ vars.PROJECT_KEY }}
 
+      # FIXME: I don't think this is needed.
       - name: "[Setup] Verify JFrog CLI Configuration"
         run: |
           echo "🔧 Verifying JFrog CLI configuration"
@@ -281,6 +177,7 @@ jobs:
 
           jf rt ping
 
+      # FIXME: Update python version
       - name: "[Setup] Python"
         uses: actions/setup-python@v5
         with:
@@ -290,12 +187,11 @@ jobs:
         run: |
           python -m pip install --upgrade "pip<25"
           pip install build twine
-
           pip install -r requirements.txt
-
           pip install -e .[dev]
-          echo "✅ Installed bookverse-core dependencies"
 
+      # FIXME: Make the percentage thing a script.
+      # FIXME: Make this upload evidence, not store to environs.
       - name: "[Test] Run tests with coverage"
         id: test-coverage
         run: |
@@ -315,6 +211,7 @@ jobs:
           echo "COVERAGE_PERCENT=$COVERAGE_PERCENT" >> $GITHUB_ENV
           echo "✅ Tests passed with $COVERAGE_PERCENT% coverage"
 
+      # FIXME: Move to a script
       - name: "[Build] Package library"
         id: set-version
         run: |
@@ -344,6 +241,7 @@ jobs:
         run: |
           set -euo pipefail
 
+          jf rt upload "dist/"
           jf rt upload "dist/*.whl" "${{ vars.PROJECT_KEY }}-core-internal-python-DEV-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
           jf rt upload "dist/*.tar.gz" "${{ vars.PROJECT_KEY }}-core-internal-python-DEV-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
 
