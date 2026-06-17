@@ -168,9 +168,9 @@ jobs:
           JFROG_CLI_BUILD_NAME: ${{ env.BUILD_NAME }}
           JFROG_CLI_BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
           JFROG_CLI_BUILD_PROJECT: ${{ vars.PROJECT_KEY }}
-        run: |
-          jf --version
-          jf rt ping
+#        run: |
+#          jf --version
+#          jf rt ping
 
       # FIXME: I don't think this is needed.
 #      - name: "[Setup] Verify JFrog CLI Configuration"
