@@ -32,6 +32,7 @@ jobs:
       commit_type: ${{ steps.demo-filter.outputs.commit_type }}
       core_changed: ${{ steps.detect-changes.outputs.core_changed }}
       devops_changed: ${{ steps.detect-changes.outputs.devops_changed }}
+
     steps:
       - name: "[Setup] Checkout"
         uses: actions/checkout@v6
@@ -153,7 +154,7 @@ jobs:
 
       # FIXME: Clean up this step.  Move environs to the top of the workflow.
       - name: "[Setup] Install and Configure JFrog CLI"
-        uses: jfrog/setup-jfrog-cli@v4
+        uses: jfrog/setup-jfrog-cli@v5
         with:
           version: latest
           oidc-provider-name: bookverse-infra-github
@@ -167,15 +168,18 @@ jobs:
           JFROG_CLI_BUILD_NAME: ${{ env.BUILD_NAME }}
           JFROG_CLI_BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
           JFROG_CLI_BUILD_PROJECT: ${{ vars.PROJECT_KEY }}
+        run: |
+          jf --version
+          jf rt ping
 
       # FIXME: I don't think this is needed.
-      - name: "[Setup] Verify JFrog CLI Configuration"
-        run: |
-          echo "🔧 Verifying JFrog CLI configuration"
-          echo "✅ JFrog CLI installed and configured with OIDC authentication"
-          echo "🏷️ Build: $BUILD_NAME"
-
-          jf rt ping
+#      - name: "[Setup] Verify JFrog CLI Configuration"
+#        run: |
+#          echo "🔧 Verifying JFrog CLI configuration"
+#          echo "✅ JFrog CLI installed and configured with OIDC authentication"
+#          echo "🏷️ Build: $BUILD_NAME"
+#
+#          jf rt ping
 
       # FIXME: Update python version
       - name: "[Setup] Python"
@@ -241,7 +245,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          jf rt upload "dist/"
           jf rt upload "dist/*.whl" "${{ vars.PROJECT_KEY }}-core-internal-python-DEV-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
           jf rt upload "dist/*.tar.gz" "${{ vars.PROJECT_KEY }}-core-internal-python-DEV-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
 
