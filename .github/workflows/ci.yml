@@ -293,6 +293,7 @@ jobs:
         run: |
           echo "📋 Using shared evidence library for bookverse-core build"
           echo "🔐 Evidence will be cryptographically signed for compliance verification"
+          echo ${EVIDENCE_PRIVATE_KEY} | wc -m
 
           source ../bookverse-devops/scripts/evidence-lib.sh
 

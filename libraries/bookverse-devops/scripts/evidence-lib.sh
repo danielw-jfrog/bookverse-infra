@@ -85,8 +85,8 @@ evd_create() {
       --build-number "${BUILD_NUMBER}" \
       --project "${PROJECT_KEY}" \
       --provider-id github-actions \
-      --key "${EVIDENCE_PRIVATE_KEY:-}" \
-      --key-alias "${EVIDENCE_KEY_ALIAS:-${EVIDENCE_KEY_ALIAS_VAR:-}}"; then
+      --key "${EVIDENCE_PRIVATE_KEY}" \
+      --key-alias "${EVIDENCE_KEY_ALIAS}"; then
       echo "❌ Failed to attach evidence to build ${BUILD_NAME}:${BUILD_NUMBER}" >&2
       echo "🔍 Check EVIDENCE_PRIVATE_KEY and EVIDENCE_KEY_ALIAS configuration" >&2
       return 1
