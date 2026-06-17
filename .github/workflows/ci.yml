@@ -216,6 +216,8 @@ jobs:
           echo "✅ Tests passed with $COVERAGE_PERCENT% coverage"
 
       # FIXME: Move to a script
+      # FIXME: What is this even used for?  It looks like it just lifts
+      #        the package version from the package into an environ.
       - name: "[Build] Package library"
         id: set-version
         run: |
@@ -245,8 +247,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          jf rt upload "dist/*.whl" "${{ vars.PROJECT_KEY }}-core-internal-python-DEV-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
-          jf rt upload "dist/*.tar.gz" "${{ vars.PROJECT_KEY }}-core-internal-python-DEV-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
+          jf rt upload "dist/*.whl" "${{ vars.PROJECT_KEY }}-core-internal-python-dev-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
+          jf rt upload "dist/*.tar.gz" "${{ vars.PROJECT_KEY }}-core-internal-python-dev-local/" --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
 
           echo "ℹ️  Coverage upload temporarily disabled - repository not available"
 
